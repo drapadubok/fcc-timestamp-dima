@@ -2,37 +2,35 @@
 
 var moment = require("moment");
 
-function isUnixTimestamp (d) {
-    // unix timestamp check: only signed integers, momentjs checks if unix
-    var re = /^[-]?[0-9]+$/;
-    return re.test(d) && moment.unix(d).isValid();
-}
-
-function isNaturalDate(d) {
-    return moment(d, "MMMM D, YYYY", true).isValid();
-}
-
-function getTimeStamp(d){
-    var isUnix = isUnixTimestamp(d);
-    var isNatural = isNaturalDate(d);
+var timeStamp = {
+    isUnixTimestamp: function(d) {
+        // unix timestamp check: only signed integers, momentjs checks if unix
+        var re = /^[-]?[0-9]+$/;
+        return re.test(d) && moment.unix(d).isValid();
+    },
     
-    if (isUnix || isNatural) {
-        var out = {
-            "unix": isUnix ? parseInt(d) : moment(new Date(d)).unix(),
-            "natural": isNatural ? d : moment.unix(d).format("MMMM D, YYYY"),
-        };
-    } else {
-        var out = {
-            "unix": null,
-            "natural": null,
-        };
+    isNaturalDate: function(d) {
+        return moment(d, "MMMM D, YYYY", true).isValid();
+    },
+    
+    getTimeStamp: function(d) {
+        var isUnix = this.isUnixTimestamp(d);
+        var isNatural = this.isNaturalDate(d);
+        
+        if (isUnix || isNatural) {
+            var out = {
+                "unix": isUnix ? parseInt(d) : moment(new Date(d)).unix(),
+                "natural": isNatural ? d : moment.unix(d).format("MMMM D, YYYY"),
+            };
+        } else {
+            var out = {
+                "unix": null,
+                "natural": null,
+            };
+        }
+        return out;
     }
-    
-    return out;
-}
-
-module.exports = {
-    getTimeStamp: getTimeStamp,
-    isUnixTimestamp: isUnixTimestamp,
-    isNaturalDate: isNaturalDate,
 };
+
+
+module.exports = timeStamp;
